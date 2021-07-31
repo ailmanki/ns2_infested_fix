@@ -7,6 +7,7 @@
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIAnimatedScript.lua")
+Script.Load("lua/GUIGameEndStats.lua")
 
 local kEndStates = enum({ 'AlienPlayerWin', 'MarinePlayerWin', 'AlienPlayerLose', 'MarinePlayerLose', 'AlienPlayerDraw', 'MarinePlayerDraw' })
 
@@ -81,7 +82,7 @@ function GUIGameEnd:SetGameEnded(playerWon, playerDraw, playerTeamType )
     
     local messageString = Locale.ResolveString(kMessageText[endState])
     if PlayerUI_IsASpectator() then
-        local winningTeamName = nil
+        local winningTeamName
         if endState == kEndStates.MarinePlayerWin then
             winningTeamName = InsightUI_GetTeam1Name()
             InsightUI_AddScoreForMarineWin()
@@ -98,4 +99,7 @@ function GUIGameEnd:SetGameEnded(playerWon, playerDraw, playerTeamType )
     
     self.messageText:SetText(messageString)
 
+    -- Handle/Set End Stats Header Info
+    EndStats_SetEndStatsHeaderInfo(self, playerWon, playerDraw, playerTeamType)
+    
 end
