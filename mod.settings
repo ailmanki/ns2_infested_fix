@@ -1,7 +1,26 @@
 name        = "Infested Fix"
-source_dir  = "source/"
-output_dir  = "output/"
-description = [=[Fixes endgame bug.]=]
+source_dir  = "source"
+output_dir  = "output"
+description = [=[Fixes bugs and adds a vote preview image for the following maps (similar to the mod preview):
+- infest_biodome
+- infest_caged
+- infest_combi
+- infest_derelict
+- infest_descent
+- infest_docking
+- infest_eclipse
+- infest_kodiak
+- infest_metro
+- infest_mineshaft
+- infest_origin
+- infest_refinery
+- infest_summit
+- infest_tram
+- infest_unearthed
+- infest_veil
+- infest_yana
+
+Mod ID: 98B51D00]=]
 image       = "preview.jpg"
 tag_modtype = "Custom Game Mode"
 tag_support = "Must be run on Server"
