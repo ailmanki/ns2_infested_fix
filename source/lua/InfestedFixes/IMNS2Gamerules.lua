@@ -127,6 +127,10 @@ if Server then
      * respawn playing players.
     ]]
     function NS2Gamerules:ResetGame()
+    
+        StatsUI_ResetStats()
+    
+        StatsUI_ResetStats()
         
         self:SetGameState(kGameState.NotStarted)
 
@@ -152,16 +156,13 @@ if Server then
             -- at the start of the next game, including the NS2Gamerules. This is how a map transition would have to work anyway.
             -- Do not destroy any entity that has a parent. The entity will be destroyed when the parent is destroyed or
             -- when the owner manually destroyes the entity.
-            local shieldTypes = { "GameInfo", "MapBlip", "NS2Gamerules", "PlayerInfoEntity" }
+            local shieldTypes = { "GameInfo", "MapBlip", "NS2Gamerules", "PlayerInfoEntity", "ThunderdomeRules" }
             local allowDestruction = true
             for i = 1, #shieldTypes do
                 allowDestruction = allowDestruction and not entity:isa(shieldTypes[i])
             end
             
             if allowDestruction and entity:GetParent() == nil then
-            
-                local isMapEntity = entity:GetIsMapEntity()
-                local mapName = entity:GetMapName()
                 
                 -- Reset all map entities and all player's that have a valid Client (not ragdolled players for example).
                 local resetEntity = entity:isa("TeamInfo") or entity:GetIsMapEntity() or (entity:isa("Player") and entity:GetClient() ~= nil)
@@ -184,7 +185,7 @@ if Server then
         
         -- Build list of tech points
         local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
-        if table.maxn(techPoints) < 2 then
+        if #techPoints < 2 then
             Print("Warning -- Found only %d %s entities.", table.maxn(techPoints), TechPoint.kMapName)
         end
         
@@ -198,8 +199,7 @@ if Server then
             resourcePoint:AddToMesh()        
         end
         
-        local team1TechPoint = nil
-        local team2TechPoint = nil
+        local team1TechPoint, team2TechPoint
         
         if Server.teamSpawnOverride and #Server.teamSpawnOverride > 0 then
            
@@ -270,6 +270,15 @@ if Server then
         self.team1:ResetPreservePlayers(team1TechPoint)
         self.team2:ResetPreservePlayers(team2TechPoint)
         
+        assert(self.team1:GetInitialTechPoint() ~= nil)
+        assert(self.team2:GetInitialTechPoint() ~= nil)
+        
+        -- Save data for end game stats later.
+        self.startingLocationNameTeam1 = team1TechPoint:GetLocationName()
+        self.startingLocationNameTeam2 = team2TechPoint:GetLocationName()
+        self.startingLocationsPathDistance = GetPathDistance(team1TechPoint:GetOrigin(), team2TechPoint:GetOrigin())
+        self.initialHiveTechId = nil
+        
         self.worldTeam:ResetPreservePlayers(nil)
         self.spectatorTeam:ResetPreservePlayers(nil)    
         
@@ -315,6 +324,8 @@ if Server then
         
         self.team1:OnResetComplete()
         self.team2:OnResetComplete()
+        
+        StatsUI_InitializeTeamStatsAndTechPoints(self)
         
     end
     

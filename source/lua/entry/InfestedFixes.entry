@@ -1,4 +1,4 @@
 modEntry = {
-    FileHooks = "lua/InfestedFixes/Filehooks.lua",
-    Priority = 110 -- higher then infested
+    FileHooks = "lua/InfestedFixes/FileHooks.lua",
+    Priority = 110 -- infested is 100
 }
