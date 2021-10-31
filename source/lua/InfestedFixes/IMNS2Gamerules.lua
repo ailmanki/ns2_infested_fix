@@ -143,7 +143,7 @@ if Server then
         -- the game (hives, command structures, initial resource towers, etc)
         -- We need to convert the EntityList to a table since we are destroying entities
         -- within the EntityList here.
-        for index, entity in ientitylist(Shared.GetEntitiesWithClassname("Entity")) do
+        for _, entity in ientitylist(Shared.GetEntitiesWithClassname("Entity")) do
         
             -- Don't reset/delete NS2Gamerules or TeamInfo.
             -- NOTE!!!
@@ -195,7 +195,7 @@ if Server then
         end
         
         -- add obstacles for resource points back in
-        for index, resourcePoint in ientitylist(resourcePoints) do        
+        for _, resourcePoint in ientitylist(resourcePoints) do
             resourcePoint:AddToMesh()        
         end
         
@@ -289,19 +289,9 @@ if Server then
         self.clientpres = {}
         
         -- Create team specific entities
-        local commandStructure1 = self.team1:ResetTeam()
-        
-        -- login the commanders again
-        local function LoginCommander(commandStructure, client)
-            local player = client and client:GetControllingPlayer()
-            if commandStructure and player then
-                -- make up for not manually moving to CS and using it
-                commandStructure.occupied = not client:GetIsVirtual()
-                player:SetOrigin(commandStructure:GetDefaultEntryOrigin())
-                commandStructure:LoginPlayer(player,true)
-            end
-        end
-        
+        self.team1:ResetTeam()
+        --self.team2:ResetTeam()
+               
         -- Create living map entities fresh
         CreateLiveMapEntities()
         
@@ -311,10 +301,14 @@ if Server then
         self.forceGameStart = false
         self.preventGameEnd = nil
         -- Reset banned players for new game
-        self.bannedPlayers = {}
         
+        if not self.bannedPlayers then
+            self.bannedPlayers = unique_set()
+        end
+        self.bannedPlayers:Clear()
+
         -- Send scoreboard and tech node update, ignoring other scoreboard updates (clearscores resets everything)
-        for index, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+        for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
             Server.SendCommand(player, "onresetgame")
             player.sendTechTreeBase = true
         end
@@ -326,7 +320,6 @@ if Server then
         self.team2:OnResetComplete()
         
         StatsUI_InitializeTeamStatsAndTechPoints(self)
-        
     end
     
     local function StartCountdown(self)
